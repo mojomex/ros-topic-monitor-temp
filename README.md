@@ -44,4 +44,3 @@ ros2 run topic_monitor topic_monitor --ros-args -p topic_list:=<PATH TO INPUT YA
 ## List of Parameters and Descriptions
 - `topic_list`: path to yaml file containing lists of topics and optionally frequency requirements
 - `update_interval`: frequency to output updated statistics (milliseconds) (`default: 1000`)
->>>>>>> c0898c2 (Add README.md)
