@@ -23,9 +23,7 @@ public:
         // set qos_settings to least stringent settings so it can receive all messages
         qos_settings_.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
         qos_settings_.durability(RMW_QOS_POLICY_DURABILITY_VOLATILE);
-        // qos_settings_.deadline(RMW_QOS_DEADLINE_DEFAULT); // this is called "default" so probably fine to not set manually
         qos_settings_.liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC);
-        // qos_settings_.liveliness_lease_duration(RMW_QOS_LIVELINESS_LEASE_DURATION_DEFAULT); // this is called "default" so probably fine to not set manually
 
         // intialize topics to 0 msgs to make print_results work
         RCLCPP_INFO(this->get_logger(), "intialize topics to 0 msgs to make print_results work");
@@ -69,20 +67,18 @@ private:
     std::shared_mutex topics_to_subscribers_lock_;
     std::string output_file_;
     int test_duration_ = 0;
-    // int test_duration_ = 59999;
     int callback_count_ = 0;
     std::mutex callback_count_mutex_;
     
 
     void print_results(){
         elapsed_time_ms_ += update_interval_ms_;
-        if (test_duration_ != 0){ // used for debugging
+
+        if (test_duration_ != 0){   // used for debugging
             elapsed_time_ms_ = test_duration_;
         }
-
-        // RCLCPP_INFO(this->get_logger(), "Printing latest results...");
         
-        // TODO: print latest results
+        // print latest results
         std::stringstream output_stream;
         std::shared_lock lock_msg_count(msg_count_lock_);
         for(auto pair : msg_count_){
@@ -91,21 +87,19 @@ private:
             auto color_to_use = GREEN;
             double min_rate;
             double max_rate;
+
             {
                 std::shared_lock lock(topics_to_rate_lock_);
-                // RCLCPP_INFO(this->get_logger(), "Getting min rate");
                 min_rate = topics_to_rate_[topic][0];
-                // RCLCPP_INFO(this->get_logger(), "Getting max rate");
                 max_rate = topics_to_rate_[topic][1];
             }
-            // RCLCPP_INFO(this->get_logger(), "Determining which color to use");
+
             if (num_msgs == 0){
                 color_to_use = RED;
             }
             else if ((num_msgs*1000.0)/elapsed_time_ms_ > max_rate || (num_msgs*1000.0)/elapsed_time_ms_ < min_rate) {
                 color_to_use = YELLOW;
             }
-            // RCLCPP_INFO(this->get_logger(), "Pushing results to output_stream");
             output_stream << color_to_use << "Statistics for topic " << topic << "\n" << "Message count = " << num_msgs << ", Message frequency = " << ((double)1000*num_msgs)/elapsed_time_ms_ << COLOR_END << "\n\n";
         }
 
@@ -119,21 +113,18 @@ private:
     }
 
     void callback_subscription(std::string topic_name){ 
-        callback_count_mutex_.lock();
-        if (++callback_count_ > 1){
-            RCLCPP_INFO(this->get_logger(), "Callback parallelization success! Currently, %d callbacks are executing", callback_count_);
-        }
-        else {
-            // RCLCPP_INFO(this->get_logger(), "Currently no callback parallelization. %d callbacks are executing", callback_count_);
-        }
-        callback_count_mutex_.unlock();
+        // callback_count_mutex_.lock();
+        // if (++callback_count_ > 1){
+        //     RCLCPP_INFO(this->get_logger(), "Callback parallelization success! Currently, %d callbacks are executing", callback_count_);
+        // }
+        // callback_count_mutex_.unlock();
         // RCLCPP_INFO(this->get_logger(), "Incrementing msg_count[%s]", topic_name.c_str());
-        std::unique_lock lock(msg_count_lock_); // TODO: I may be able to make this lock shared if I can guarantee no one is accessing the same element?
+        std::shared_lock lock(msg_count_lock_); // TODO: I may be able to make this lock shared if I can guarantee no one is accessing the same element?
         msg_count_[topic_name]++;
         // RCLCPP_INFO(this->get_logger(), "Msg count incremented!");
-        callback_count_mutex_.lock();
-        callback_count_--;
-        callback_count_mutex_.unlock();
+        // callback_count_mutex_.lock();
+        // callback_count_--;
+        // callback_count_mutex_.unlock();
     }
 
     void init_subscriber(std::string topic_name){ // **CRITICAL SECTION**
@@ -161,7 +152,7 @@ private:
                     auto new_sub = this->create_generic_subscription(name_type_pair.first, name_type_pair.second[0], qos_settings_, std::bind(&RosbagCheckerLiveNode::callback_subscription, this, name_type_pair.first), subscription_options);
                     
                     { // place inside block so that lock is released immediately after insertion
-                        std::unique_lock lock(topics_to_subscribers_lock_); // TODO: lock!
+                        std::unique_lock lock(topics_to_subscribers_lock_); // lock!
                         topics_to_subscribers_.insert({name_type_pair.first, new_sub});
                     }
 
