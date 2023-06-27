@@ -1,10 +1,12 @@
-# Rosbag Checker
+# Topic Monitor
 
 ## Description
 A ROS2 package to monitor the message count and message frequency of given topic(s). 
 
 ### Input:
-1. A `yaml` file containing a list of topics, and optionally, frequency requirements ([see example yaml file here for format](https://github.com/bgtier4/rosbag-checker/blob/cpp/input_yaml_format.yaml)).
+1. One of the following:
+    - `yaml` file containing a list of topics, and optionally, frequency requirements ([see example yaml file here for format](https://github.com/bgtier4/rosbag-checker/blob/cpp/input_yaml_format.yaml)).
+    - single topic name or regular expression to be monitors.
 
 ### Output:
 The given list of topics with number of messages recorded by the rosbag, and message frequency.
@@ -43,4 +45,6 @@ ros2 run topic_monitor topic_monitor --ros-args -p topic_list:=<PATH TO INPUT YA
 
 ## List of Parameters and Descriptions
 - `topic_list`: path to yaml file containing lists of topics and optionally frequency requirements
+- `topics`: name of topic or regular expression to monitor (alternative to topic_list)
 - `update_interval`: frequency to output updated statistics (milliseconds) (`default: 1000`)
+- `default_frequency_requirements`: default frequency requirements (`default: [-1, maximum float]`)

@@ -19,7 +19,7 @@ public:
         this->declare_parameter("topics", "");
         this->declare_parameter("update_interval", 1000);
         this->declare_parameter("output_file", "");
-        this->declare_parameter("default_frequency_requirements", std::vector<double>({std::numeric_limits<double>::min(), std::numeric_limits<double>::max()}));
+        this->declare_parameter("default_frequency_requirements", std::vector<double>({-1.0, std::numeric_limits<double>::max()}));
         output_file_ = this->get_parameter("output_file").as_string();
         frequency_requirements_ = this->get_parameter("default_frequency_requirements").as_double_array();
 
