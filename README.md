@@ -6,7 +6,7 @@ A ROS2 package to monitor the message count and message frequency of given topic
 ### Input:
 1. One of the following:
     - `yaml` file containing a list of topics, and optionally, frequency requirements ([see example yaml file here for format](https://github.com/bgtier4/rosbag-checker/blob/cpp/input_yaml_format.yaml)).
-    - single topic name or regular expression to be monitors.
+    - single topic name or regular expression to be monitored.
 
 ### Output:
 The given list of topics with number of messages recorded by the rosbag, and message frequency.
@@ -14,7 +14,7 @@ The given list of topics with number of messages recorded by the rosbag, and mes
 - Yellow output indicates that messages corresponding to that topic were found but frequency requirements were NOT met.
 - Red output indicates that no messages were found corresponding to that topic.
 
-Output is written to the terminal every `update interval` (default = 1000ms)
+Updated output is written to the terminal every `update interval` (default = 1000ms)
 
 ## Requirements
 - ROS2 Humble
