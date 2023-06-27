@@ -16,11 +16,14 @@ public:
         // parameters
         RCLCPP_INFO(this->get_logger(), "parameters");
         this->declare_parameter("topic_list", "");
+        this->declare_parameter("topics", "");
         this->declare_parameter("update_interval", 1000);
         this->declare_parameter("output_file", "");
+        this->declare_parameter("default_frequency_requirements", std::vector<double>({std::numeric_limits<double>::min(), std::numeric_limits<double>::max()}));
         output_file_ = this->get_parameter("output_file").as_string();
+        frequency_requirements_ = this->get_parameter("default_frequency_requirements").as_double_array();
 
-        // set qos_settings to least stringent settings so it can receive all messages
+        // set qos_settings to most permissive settings so it can receive all messages
         qos_settings_.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
         qos_settings_.durability(RMW_QOS_POLICY_DURABILITY_VOLATILE);
         qos_settings_.liveliness(RMW_QOS_POLICY_LIVELINESS_AUTOMATIC);
@@ -28,7 +31,16 @@ public:
         // intialize topics to 0 msgs to make print_results work
         RCLCPP_INFO(this->get_logger(), "intialize topics to 0 msgs to make print_results work");
         auto yaml_file_loc = this->get_parameter("topic_list").as_string();
-        topics_to_rate_ = parse_yaml(yaml_file_loc);
+        auto input_topics = this->get_parameter("topics").as_string();
+        if (!yaml_file_loc.empty()){
+            topics_to_rate_ = parse_yaml(yaml_file_loc);
+        }
+        else if (!input_topics.empty()){
+            topics_to_rate_[input_topics] =  frequency_requirements_;
+        }
+        else {
+            RCLCPP_ERROR(this->get_logger(), "No topics to monitor specified");
+        }
         for (auto pair : topics_to_rate_) {
             auto topic_name = pair.first;
             msg_count_.insert({topic_name, 0});
@@ -69,6 +81,7 @@ private:
     int test_duration_ = 0;
     int callback_count_ = 0;
     std::mutex callback_count_mutex_;
+    std::vector<double> frequency_requirements_;
     
 
     void print_results(){
@@ -167,7 +180,7 @@ private:
                             msg_count_.erase(topic_name);
                         }
                         std::unique_lock lock(topics_to_rate_lock_);
-                        topics_to_rate_.insert({name_type_pair.first, std::vector<double>{-1, 1000}});
+                        topics_to_rate_.insert({name_type_pair.first, frequency_requirements_});
                     }
                 }
             }
@@ -188,7 +201,7 @@ private:
                 hz_range = topic["hz_range"].as<std::vector<double>>();
             }
             catch(...) {
-                hz_range = std::vector<double>({-1, 1000000});
+                hz_range = frequency_requirements_;
             }
             topics_to_rate.insert({topic_name, hz_range});
         }
