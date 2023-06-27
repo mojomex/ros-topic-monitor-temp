@@ -13,6 +13,7 @@ The given list of topics with number of messages recorded by the rosbag, and mes
 - Green output indicates that messages corresponding to that topic were found and frequency requirements were met.
 - Yellow output indicates that messages corresponding to that topic were found but frequency requirements were NOT met.
 - Red output indicates that no messages were found corresponding to that topic.
+
 Output is written to the terminal every `update interval` (default = 1000ms)
 
 ## Requirements
