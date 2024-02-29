@@ -295,7 +295,7 @@ private:
             {
                 output_stream << RED << "No messages received for the following topics:"
                               << "\n";
-                for (topic : no_msg_topics)
+                for (auto topic : no_msg_topics)
                 {
                     output_stream << topic << ", ";
                 }
@@ -305,7 +305,7 @@ private:
             {
                 output_stream << YELLOW << "Topic frequency for the following topics is outside of specified frequency requirements:"
                               << "\n";
-                for (topic : wrong_freq_topics)
+                for (auto topic : wrong_freq_topics)
                 {
                     output_stream << topic << ", ";
                 }
