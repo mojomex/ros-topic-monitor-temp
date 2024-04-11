@@ -1,0 +1,7 @@
+topics:
+  - name: /pandar_packets
+    hz_range: [9.9, 12]
+    type: pandar_msgs/msg/PandarScan
+  - name: /pandar_points
+    hz_range: [9.9, 12]
+    type: sensor_msgs/msg/PointCloud2

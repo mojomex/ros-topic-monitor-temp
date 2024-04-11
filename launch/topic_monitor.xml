@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="topic_list"/>
+
+    <node_container pkg="rclcpp_components" exec="component_container_mt" name="topic_monitor_container" 
+        output="screen" namespace="">
+        <composable_node pkg="topic_monitor" plugin="RosbagCheckerLiveNode"
+               name="topic_monitor_component">
+            <param name="topic_list" value="$(var topic_list)"/>
+        </composable_node>
+    </node_container>
+</launch>
